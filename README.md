@@ -1,2 +1,76 @@
 # stock-analysis
 Practice analyzing stock trends
+# Overview of Project
+
+This project investigates the benefits and challenges of refactoring code. Two different versions of the AllStocksAnalysis macro were run to compare the changes in runtime. The refactored version of the code also color-indicates stocks based on whether they were overall gains or losses for 2017-2018 and by what percentage. 
+
+The analysis begins with initializing the input box for the user to select which year to analyze, followed by initializing some startTime and endTime variables to track this macro's run-time:
+
+Sub AllStocksAnalysisRefactored()
+    'Create an input to select year
+    yearValue = InputBox("What year would you like to run the analysis on?")
+   'Initialize start and end time variables
+    Dim startTime As Single
+    Dim endTime  As Single
+
+Then we initialize an array of all tickers:
+
+    Dim tickers(11) As String
+
+Find the number of rows to loop over:
+
+    RowEnd = Cells(Rows.Count, "A").End(xlUp).Row
+
+If the ticker for the current row is the same as last row, add its value to the tickerVolumes variable:
+
+    For i = 2 To RowEnd
+                'Check if current ticker is the same value as previous row
+                If Cells(i, 1).Value = tickers(tickerIndex) Then
+                'Add the value of current ticker to tickerVolumes
+                tickerVolumes(tickerIndex) = tickerVolumes(tickerIndex) + Cells(i, 8).Value
+                End If
+
+If the ticker for the current row is the first row with that ticker, set that value as its starting price:
+
+    If Cells(i - 1, 1).Value <> tickers(tickerIndex) And Cells(i, 1).Value = tickers(tickerIndex) Then
+                            tickerStartingPrices(tickerIndex) = Cells(i, 6).Value
+
+If the ticker for the current row is the last row with the selected ticker, set that value as its ending price, then increase the ticker index by 1:
+
+If Cells(i + 1, 1).Value <> tickers(tickerIndex) And Cells(i, 1).Value = tickers(tickerIndex) Then
+                            tickerEndingPrices(tickerIndex) = Cells(i, 6).Value
+                          ' Increase the tickerIndex.
+                          ' If the next row's ticker doesn't match, increase the tickerIndex.
+                            tickerIndex = tickerIndex + 1
+                End If
+
+Format the output table, then color-code the results according to their percent changes:
+
+Worksheets("All Stocks Analysis").Activate
+                Range("A3:C3").Font.FontStyle = "Bold"
+                Range("A3:C3").Borders(xlEdgeBottom).LineStyle = xlContinuous
+                Range("B4:B15").NumberFormat = "#,##0"
+                Range("C4:C15").NumberFormat = "0.0%"
+                Columns("B").AutoFit
+                dataRowStart = 4
+                dataRowEnd = 15
+                'Color tickers with gains green and losses red
+                For i = dataRowStart To dataRowEnd
+                    If Cells(i, 3).Value > 0 Then
+                        Cells(i, 3).Interior.Color = vbGreen
+                    Else
+                        Cells(i, 3).Interior.Color = vbRed
+                    End If
+
+## Results
+
+'Link to runtime for 2017: https://imgur.com/VUNapmL
+'Link to runtime for 2018: https://imgur.com/cvRjYj2
+
+
+Based on the runtime output messages from the refactored macro, we can see that runtimes for the refactored code for each year are nearly equal. These are small increases from the original code runtimes, which didn't include any code to color-indicate results boxes or to track a runtime variable. 
+
+
+### Summary
+
+Generally the main benefits of refactoring code are improving performance, either through shorter run times or resolving bugs, and improving readability. Typically consolidating redundant or wordy code into something more efficient improves runtimes by limiting the number of processes being carried out, while in this case runtimes increased slightly because of added code blocks for color-coding. 
